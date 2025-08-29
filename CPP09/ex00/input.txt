@@ -1,0 +1,12 @@
+200X-01-01 | 1 #Test voir si alphabetique erreur
+2008-01-01 | 1 #Date qui existe pas mais pas de date anterieur a qui prendre valeur
+2011-01-03 | 3
+2011-01-03 | 2
+2011-01-03 | 1
+2011-01-03 | 1.2
+2011-01-06 | 1 #Date qui existe pas -> Prend valeur de 2011/01/03
+2011-01-09 | 1
+2012-01-11 | -1 #Negatif -> erreur
+2001-42-42 | 1 #Date invalide
+2012-01-11 | 1
+2012-01-11 | 2147483648  #Valeur trop grande

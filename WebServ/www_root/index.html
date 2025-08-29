@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Accueil</title>
+	<style>
+		body {
+			background-image: url('imgs/CrownCorgi.jpg');
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			min-height: 100vh;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+		}
+
+		h1 {
+			color: #fff;
+			text-shadow: 2px 2px 8px #000, 0 0 10px #FFD700;
+			font-family: 'Segoe UI', Arial, sans-serif;
+			font-size: 3em;
+			margin-bottom: 30px;
+			text-align: center;
+		}
+
+		button {
+			padding: 15px 30px;
+			font-size: 1.2em;
+			border: none;
+			border-radius: 8px;
+			background: #FFD700;
+			color: #333;
+			cursor: pointer;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+			transition: background 0.2s, color 0.2s;
+		}
+
+		button:hover {
+			background: #fff;
+			color: #FFD700;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Bienvenue sur la page d'accueil</h1>
+	<button onclick="window.location.href='/test_method'">Pour tester les methodes HTTP</button>
+	<button onclick="window.location.href='/test_cgi'" style="margin-top:20px;">Pour tester les CGI</button>
+	<button onclick="window.location.href='/test_cookie'" style="margin-top:20px;">Pour les cookies</button>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+webserv
+*.a
+*.o
+*.d
+tester

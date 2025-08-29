@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Test CGI</title>
+	<style>
+		body {
+			background-image: url('/imgs/CorgiBark.jpg');
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			min-height: 100vh;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+		}
+
+		h1 {
+			color: #fff;
+			text-shadow: 2px 2px 8px #000, 0 0 10px #ed61fa;
+			font-family: 'Segoe UI', Arial, sans-serif;
+			font-size: 3em;
+			margin-bottom: 30px;
+			text-align: center;
+		}
+
+		p {
+			color: #fff;
+			font-size: 1.3em;
+			text-shadow: 1px 1px 6px #000;
+			margin-bottom: 40px;
+			text-align: center;
+			max-width: 600px;
+		}
+
+		.button-row {
+			display: flex;
+			gap: 20px;
+			margin-bottom: 30px;
+		}
+
+		button,
+		a.button {
+			padding: 15px 30px;
+			font-size: 1.2em;
+			border: none;
+			border-radius: 8px;
+			background: #ed61fa;
+			color: #fff;
+			cursor: pointer;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+			transition: background 0.2s, color 0.2s;
+			text-decoration: none;
+			font-weight: bold;
+		}
+
+		button:hover,
+		a.button:hover {
+			background: #fff;
+			color: #ed61fa;
+		}
+
+		#scriptname,
+		#query,
+		#postBody {
+			border-radius: 6px;
+			border: 1px solid #ccc;
+			font-size: 1em;
+			padding: 10px;
+		}
+
+		#scriptname,
+		#query {
+			min-width: 200px;
+		}
+
+		#postBody {
+			min-width: 300px;
+			resize: vertical;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Test CGI</h1>
+	<p>Testez vos scripts CGI (.py, .php, etc) en GET ou POST.<br>
+		Le script doit être dans un dossier CGI accessible par le serveur.</p>
+	<div class="button-row">
+		<input id="scriptname" type="text" placeholder="folder/script (cgi-bin/test.py)" />
+		<input id="query" type="text" placeholder="Arguments GET (ex: a=1&b=2)" />
+		<button onclick="testCGI('GET')">GET</button>
+	</div>
+	<div class="button-row">
+		<textarea id="postBody" placeholder="Contenu à envoyer en POST" rows="2"></textarea>
+		<button onclick="testCGI('POST')">POST</button>
+	</div>
+	<a class="button" href="/">Retour à l'accueil</a>
+
+	<!-- Affichage côte à côte -->
+	<div style="display: flex; gap: 30px; justify-content: center; margin-top: 30px;">
+		<div id="result-brut"
+			style="flex:1; background:rgba(0,0,0,0.6);color:#fff;padding:15px 30px;border-radius:8px;min-width:300px;max-width:600px;">
+			<b>Résultat brut :</b>
+			<pre id="raw-output" style="white-space:pre-wrap;color:#fff;"></pre>
+		</div>
+		<div id="result-interprete"
+			style="flex:1; background:rgba(0,0,0,0.5);color:#fff;padding:15px 30px;border-radius:8px;min-width:300px;max-width:600px;">
+			<b>Résultat interprété :</b>
+			<div id="html-output"></div>
+		</div>
+	</div>
+
+	<script>
+		function testCGI(method) {
+			const script = document.getElementById('scriptname').value.trim();
+			const query = document.getElementById('query').value.trim();
+			if (!script) {
+				document.getElementById('raw-output').textContent = "Veuillez saisir le nom du script.";
+				document.getElementById('html-output').textContent = "";
+				return;
+			}
+			let url = '/' + script;
+			if (query && method === 'GET') {
+				url += '?' + query;
+			}
+			const options = { method };
+			if (method === 'POST') {
+				options.body = document.getElementById('postBody').value;
+				options.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+				if (query) {
+					url += '?' + query;
+				}
+			}
+			document.getElementById('raw-output').textContent = 'Chargement...';
+			document.getElementById('html-output').textContent = '';
+			fetch(url, options)
+				.then(async response => {
+					const text = await response.text();
+					document.getElementById('raw-output').textContent =
+						`Status: ${response.status} ${response.statusText}\n` + text;
+					document.getElementById('html-output').innerHTML = text;
+				})
+				.catch(err => {
+					document.getElementById('raw-output').textContent = 'Erreur : ' + err;
+					document.getElementById('html-output').textContent = '';
+				});
+		}
+	</script>
+</body>
+
+</html>

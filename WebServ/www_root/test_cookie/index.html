@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Test COOKIE</title>
+	<style>
+		body {
+			background-image: url('/imgs/borderCookie.jpg');
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			min-height: 100vh;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			color: #fff;
+			font-family: 'Segoe UI', Arial, sans-serif;
+		}
+
+		h1 {
+			text-shadow: 2px 2px 8px #000, 0 0 10px #66fa61;
+			font-size: 3em;
+			margin-bottom: 30px;
+			text-align: center;
+		}
+
+		p {
+			font-size: 1.7em;
+			text-shadow: 1px 1px 6px #000;
+			margin-bottom: 40px;
+			text-align: center;
+			max-width: 600px;
+		}
+
+		.button-row {
+			display: flex;
+			gap: 20px;
+			margin-bottom: 30px;
+		}
+
+		button,
+		a.button {
+			padding: 15px 30px;
+			font-size: 1.2em;
+			border: none;
+			border-radius: 8px;
+			background: #ed61fa;
+			color: #fff;
+			cursor: pointer;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+			transition: background 0.2s, color 0.2s;
+			text-decoration: none;
+			font-weight: bold;
+		}
+
+		button:hover,
+		a.button:hover {
+			background: #fff;
+			color: #ed61fa;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Test COOKIE</h1>
+	<p>Woof, tu as visité cette page <span id="visit-count" style="color: rgb(255, 74, 201);">...</span> fois!</p>
+	<a class="button" href="/">Retour à l'accueil</a>
+
+	<script>
+		// Appel AJAX pour récupérer le nombre de visites
+		fetch('/cgi-bin/visit_count.php')
+			.then(response => {
+				if (!response.ok) throw new Error('Erreur réseau');
+				return response.json();
+			})
+			.then(data => {
+				document.getElementById('visit-count').textContent = data.visits;
+			})
+			.catch(err => {
+				document.getElementById('visit-count').textContent = 'Erreur';
+				console.error(err);
+			});
+	</script>
+</body>
+
+</html>

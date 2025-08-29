@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Test Method</title>
+	<style>
+		body {
+			background-image: url('imgs/testMethod.jpg');
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			min-height: 100vh;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+		}
+
+		h1 {
+			color: #fff;
+			text-shadow: 2px 2px 8px #000, 0 0 10px #00BFFF;
+			font-family: 'Segoe UI', Arial, sans-serif;
+			font-size: 3em;
+			margin-bottom: 30px;
+			text-align: center;
+		}
+
+		p {
+			color: #fff;
+			font-size: 1.3em;
+			text-shadow: 1px 1px 6px #000;
+			margin-bottom: 40px;
+			text-align: center;
+			max-width: 600px;
+		}
+
+		.button-row {
+			display: flex;
+			gap: 20px;
+			margin-bottom: 30px;
+		}
+
+		button,
+		a.button {
+			padding: 15px 30px;
+			font-size: 1.2em;
+			border: none;
+			border-radius: 8px;
+			background: #00BFFF;
+			color: #fff;
+			cursor: pointer;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+			transition: background 0.2s, color 0.2s;
+			text-decoration: none;
+			font-weight: bold;
+		}
+
+		button:hover,
+		a.button:hover {
+			background: #fff;
+			color: #00BFFF;
+		}
+
+		#filename,
+		#postBody {
+			border-radius: 6px;
+			border: 1px solid #ccc;
+			font-size: 1em;
+			padding: 10px;
+		}
+
+		#filename {
+			min-width: 200px;
+		}
+
+		#postBody {
+			min-width: 300px;
+			resize: vertical;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Test des méthodes HTTP</h1>
+	<p>Bienvenue sur la page de test des méthodes HTTP.<br>
+		Ici, tu peux tester GET, POST et DELETE sur le fichier de ton choix dans <b>/upload/</b> !</p>
+	<div class="button-row">
+		<input id="filename" type="text" placeholder="Nom du fichier (ex: test.txt)" />
+		<button onclick="testMethod('GET')">GET</button>
+		<button onclick="testMethod('DELETE')">DELETE</button>
+	</div>
+	<div class="button-row">
+		<textarea id="postBody" placeholder="Contenu à envoyer en POST" rows="2"></textarea>
+		<button onclick="testMethod('POST')">POST</button>
+	</div>
+	<a class="button" href="/">Retour à l'accueil</a>
+
+	<!-- Résultat brut et interprété côte à côte -->
+	<div style="display: flex; gap: 30px; justify-content: center; margin-top: 30px;">
+		<div id="result-brut"
+			style="flex:1; background:rgba(0,0,0,0.6);color:#fff;padding:15px 30px;border-radius:8px;min-width:300px;max-width:600px;">
+			<b>Résultat brut :</b>
+			<pre id="raw-output" style="white-space:pre-wrap;color:#fff;"></pre>
+		</div>
+		<div id="result-interprete"
+			style="flex:1; background:rgba(0,0,0,0.5);color:#fff;padding:15px 30px;border-radius:8px;min-width:300px;max-width:600px;">
+			<b>Résultat interprété :</b>
+			<div id="html-output"></div>
+		</div>
+	</div>
+
+	<script>
+		function testMethod(method) {
+			const filename = document.getElementById('filename').value.trim();
+			if (!filename) {
+				document.getElementById('raw-output').textContent = "Veuillez saisir un nom de fichier.";
+				document.getElementById('html-output').textContent = "";
+				return;
+			}
+			const url = '/upload/' + encodeURIComponent(filename);
+			const options = { method };
+			if (method === 'POST') {
+				options.body = document.getElementById('postBody').value;
+				options.headers = { 'Content-Type': 'text/plain' };
+			}
+			document.getElementById('raw-output').textContent = 'Chargement...';
+			document.getElementById('html-output').textContent = '';
+			fetch(url, options)
+				.then(async response => {
+					const text = await response.text();
+					document.getElementById('raw-output').textContent =
+						`Status: ${response.status} ${response.statusText}\n${text}`;
+					document.getElementById('html-output').innerHTML = text;
+				})
+				.catch(err => {
+					document.getElementById('raw-output').textContent = 'Erreur : ' + err;
+					document.getElementById('html-output').textContent = '';
+				});
+		}
+	</script>
+</body>
+
+</html>
