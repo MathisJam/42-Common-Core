@@ -1,0 +1,128 @@
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+enum UserStatus {
+    OFFLINE
+    ONLINE
+    IN_GAME
+}
+
+enum FriendStatus {
+    PENDING
+    ACCEPTED
+    DECLINED
+}
+
+model User {
+    id        Int        @id @default(autoincrement())
+    username  String     @unique
+    email     String     @unique
+    password  String?
+    oauth42Id String?    @unique
+    status    UserStatus @default(OFFLINE)
+    avatar    String?
+    createdAt DateTime   @default(now())
+
+    isTwoFAEnabled   Boolean @default(false)
+    twoFAMethod      String?
+    twoFAdestination String?
+
+    // Relations
+    friendsInitiated Friend[]        @relation("UserFriends")
+    friendsReceived  Friend[]        @relation("FriendUser")
+    sentRequests     FriendRequest[] @relation("SentRequests")
+    receivedRequests FriendRequest[] @relation("ReceivedRequests")
+    //Matchs
+    matchesAsPlayer1 Match[]         @relation("Player1")
+    matchesAsPlayer2 Match[]         @relation("Player2")
+    matchesWon       Match[]         @relation("Winner")
+
+    //2FA
+    twoFAs twoFA[]
+
+    //Stats
+    stats Stats?
+
+    @@map("users")
+}
+
+model Friend {
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    friendId  Int
+    createdAt DateTime @default(now())
+    user      User     @relation("UserFriends", fields: [userId], references: [id])
+    friend    User     @relation("FriendUser", fields: [friendId], references: [id])
+
+    @@unique([userId, friendId])
+    @@map("friends")
+}
+
+model FriendRequest {
+    id           Int      @id @default(autoincrement())
+    senderById   Int
+    receiverById Int
+    status       String   @default("pending")
+    createdAt    DateTime @default(now())
+
+    sendBy     User @relation("SentRequests", fields: [senderById], references: [id])
+    receiverBy User @relation("ReceivedRequests", fields: [receiverById], references: [id])
+
+    @@unique([senderById, receiverById])
+    @@map("friend_requests")
+}
+
+model Match {
+    id        Int      @id @default(autoincrement())
+    score1    Int
+    score2    Int
+    date      DateTime @default(now())
+    
+    player1Id Int?
+    player2Id Int?
+    winnerId  Int?
+
+    player1GuestName String?
+    player2GuestName String?
+
+    // Match Statistics
+    nbrOfBallHit    Int?     // Number of ball hits by the player
+    nbrOfBallMissed Int?     // Number of balls missed by the player
+    matchTime       Int?     // Match duration in milliseconds
+
+    player1   User? @relation("Player1", fields: [player1Id], references: [id], onDelete: SetNull)
+    player2   User? @relation("Player2", fields: [player2Id], references: [id], onDelete: SetNull)
+    winner    User? @relation("Winner", fields: [winnerId], references: [id], onDelete: SetNull)
+    
+    @@map("matches")
+}
+
+model Stats {
+    id          Int  @id @default(autoincrement())
+    userId      Int  @unique
+    gamesPlayed Int  @default(0)
+    gamesWon    Int  @default(0)
+    matchTime   Int  @default(0)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("stats")
+}
+
+model twoFA {
+    userId      Int       @id
+    method      String
+    secret      String?
+    code        String?
+    expiresAt   DateTime?
+    destination String?
+    user        User      @relation(fields: [userId], references: [id])
+
+    @@map("two_fa")
+}
